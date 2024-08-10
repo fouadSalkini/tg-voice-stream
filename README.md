@@ -14,6 +14,8 @@
   <b>A Smooth & Fast Telegram Voice Chat Music Streaming Bot based on Pyrogram & PyTgCalls.</b>
 </h3>
 
+https://heroku.com/deploy
+
 ------
 <h3 align="center">
 
