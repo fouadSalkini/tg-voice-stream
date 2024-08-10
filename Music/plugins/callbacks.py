@@ -83,9 +83,9 @@ async def controler_cb(_, cb: CallbackQuery):
             await db.set_watcher(cb.message.chat.id, "pause", True)
             await hellmusic.pause_vc(cb.message.chat.id)
             await cb.answer("Paused!", show_alert=True)
-            return await cb.message.reply_text(
-                f"__VC Paused by:__ {cb.from_user.mention}"
-            )
+            # return await cb.message.reply_text(
+            #     f"__VC Paused by:__ {cb.from_user.mention}"
+            # )
     elif action == "mute":
         is_muted = await db.get_watcher(cb.message.chat.id, "mute")
         if is_muted:
