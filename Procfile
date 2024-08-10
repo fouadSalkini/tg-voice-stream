@@ -1,1 +1,1 @@
-worker: bash StartMusic
+web: python3 -m Music
