@@ -75,14 +75,14 @@ async def controler_cb(_, cb: CallbackQuery):
         if is_paused:
             await db.set_watcher(cb.message.chat.id, "pause", False)
             await hellmusic.resume_vc(cb.message.chat.id)
-            await cb.answer("Resumed!", show_alert=True)
-            return await cb.message.reply_text(
+            return await cb.answer("Resumed!", show_alert=True)
+            await cb.message.reply_text(
                 f"__VC Resumed by:__ {cb.from_user.mention}"
             )
         else:
             await db.set_watcher(cb.message.chat.id, "pause", True)
             await hellmusic.pause_vc(cb.message.chat.id)
-            await cb.answer("Paused!", show_alert=True)
+            return await cb.answer("Paused!", show_alert=True)
             # return await cb.message.reply_text(
             #     f"__VC Paused by:__ {cb.from_user.mention}"
             # )
@@ -93,35 +93,35 @@ async def controler_cb(_, cb: CallbackQuery):
         else:
             await db.set_watcher(cb.message.chat.id, "mute", True)
             await hellmusic.mute_vc(cb.message.chat.id)
-            await cb.answer("Muted!", show_alert=True)
-            return await cb.message.reply_text(
-                f"__VC Muted by:__ {cb.from_user.mention}"
-            )
+            return await cb.answer("Muted!", show_alert=True)
+            # return await cb.message.reply_text(
+            #     f"__VC Muted by:__ {cb.from_user.mention}"
+            # )
     elif action == "unmute":
         is_muted = await db.get_watcher(cb.message.chat.id, "mute")
         if is_muted:
             await db.set_watcher(cb.message.chat.id, "mute", False)
             await hellmusic.unmute_vc(cb.message.chat.id)
-            await cb.answer("Unmuted!", show_alert=True)
-            return await cb.message.reply_text(
-                f"__VC Unmuted by:__ {cb.from_user.mention}"
-            )
+            return await cb.answer("Unmuted!", show_alert=True)
+            # return await cb.message.reply_text(
+            #     f"__VC Unmuted by:__ {cb.from_user.mention}"
+            # )
         else:
             return await cb.answer("Already unmuted!", show_alert=True)
     elif action == "end":
         await hellmusic.leave_vc(cb.message.chat.id)
         await db.set_loop(cb.message.chat.id, 0)
-        await cb.answer("Left the VC!", show_alert=True)
-        return await cb.message.reply_text(f"__VC Stopped by:__ {cb.from_user.mention}")
+        return await cb.answer("Left the VC!", show_alert=True)
+        # return await cb.message.reply_text(f"__VC Stopped by:__ {cb.from_user.mention}")
     elif action == "loop":
         is_loop = await db.get_loop(cb.message.chat.id)
         final = is_loop + 3
         final = 10 if final > 10 else final
         await db.set_loop(cb.message.chat.id, final)
-        await cb.answer(f"Loop set to {final}", show_alert=True)
-        return await cb.message.reply_text(
-            f"__Loop set to {final}__ by: {cb.from_user.mention}\n\nPrevious loop was {is_loop}"
-        )
+        return await cb.answer(f"Loop set to {final}", show_alert=True)
+        # return await cb.message.reply_text(
+        #     f"__Loop set to {final}__ by: {cb.from_user.mention}\n\nPrevious loop was {is_loop}"
+        # )
     elif action == "replay":
         hell = await cb.message.reply_text("Processing ...")
         que = Queue.get_queue(cb.message.chat.id)
@@ -172,9 +172,9 @@ async def controler_cb(_, cb: CallbackQuery):
         except:
             return await cb.answer("Something went wrong!", show_alert=True)
         Queue.update_duration(cb.message.chat.id, 0, to_seek)
-        await cb.message.reply_text(
-            f"__Seeked back by {seek_time} seconds!__ \n\nBy: {cb.from_user.mention}"
-        )
+        # await cb.message.reply_text(
+        #     f"__Seeked back by {seek_time} seconds!__ \n\nBy: {cb.from_user.mention}"
+        # )
     elif action == "fseek":
         que = Queue.get_queue(cb.message.chat.id)
         if que == []:
@@ -197,9 +197,9 @@ async def controler_cb(_, cb: CallbackQuery):
         except:
             return await cb.answer("Something went wrong!", show_alert=True)
         Queue.update_duration(cb.message.chat.id, 1, to_seek)
-        await cb.message.reply_text(
-            f"__Seeked forward by {seek_time} seconds!__ \n\nBy: {cb.from_user.mention}"
-        )
+        # await cb.message.reply_text(
+        #     f"__Seeked forward by {seek_time} seconds!__ \n\nBy: {cb.from_user.mention}"
+        # )
     elif action == "back":
         que = Queue.get_queue(cb.message.chat.id)
         if que == []:
