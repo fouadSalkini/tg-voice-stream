@@ -114,7 +114,7 @@ async def play_music(_, message: Message, context: dict):
             await hell.edit("Searching ...")
             result = await ytube.get_data(url, False)
         except Exception as e:
-            return await hell.edit(f"**Error:**\n`{e}`")
+            return await hell.edit(f"**Error fetching youtube:**\n`{e}`")
         context = {
             "chat_id": message.chat.id,
             "user_id": message.from_user.id,
