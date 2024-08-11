@@ -238,22 +238,22 @@ async def restart_(_, message: Message):
 @hellbot.app.on_message(filters.command("sudolist") & Config.SUDO_USERS)
 @UserWrapper
 async def sudoers_list(_, message: Message):
-    text = "**⍟ God Users:**\n"
-    gods = 0
-    for x in Config.GOD_USERS:
+    text = "**⍟ Super Users:**\n"
+    super = 0
+    for x in Config.SUPER_USERS:
         try:
             if x in user_data.DEVS:
                 continue
             user = await hellbot.app.get_users(x)
             user = user.first_name if not user.mention else user.mention
-            gods += 1
+            super += 1
         except Exception:
             continue
-        text += f"{'0' if gods <= 9 else ''}{gods}: {user}\n"
+        text += f"{'0' if super <= 9 else ''}{super}: {user}\n"
     sudos = 0
     for user_id in Config.SUDO_USERS:
         if user_id not in user_data.DEVS:
-            if user_id in Config.GOD_USERS:
+            if user_id in Config.SUPER_USERS:
                 continue
             try:
                 user = await hellbot.app.get_users(user_id)
@@ -261,11 +261,11 @@ async def sudoers_list(_, message: Message):
                 if sudos == 0:
                     sudos += 1
                     text += "\n**⍟ Sudo Users:**\n"
-                gods += 1
-                text += f"{'0' if gods <= 9 else ''}{gods}: {user}\n"
+                super += 1
+                text += f"{'0' if super <= 9 else ''}{super}: {user}\n"
             except Exception:
                 continue
-    if gods == 0:
+    if super == 0:
         await message.reply_text("No sudo users found.")
     else:
         await message.reply_text(text)

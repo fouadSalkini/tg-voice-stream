@@ -36,7 +36,7 @@ class Config(object):
     CACHE_DIR = "./cache/"
     DELETE_DICT = {}
     DWL_DIR = "./downloads/"
-    GOD_USERS = filters.user()
+    SUPER_USERS = filters.user()
     PLAYER_CACHE = {}
     QUEUE_CACHE =  {}
     SONG_CACHE = {}
