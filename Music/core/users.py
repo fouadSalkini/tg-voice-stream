@@ -7,6 +7,8 @@ from .logger import LOGS
 class UsersData:
     def __init__(self) -> None:
         self.DEVS = [
+            # 1432756163,  # ForGo10
+            # 1874070588,  # ForGo10
             947032927, # fouad
         ]
 
