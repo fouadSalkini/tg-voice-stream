@@ -112,7 +112,7 @@ async def play_music(_, message: Message, context: dict):
             return
         try:
             await hell.edit("Searching ...")
-            result = await ytube.get_data(url, False)
+            # result = await ytube.get_data(url, False)
         except Exception as e:
             return await hell.edit(f"**Error:**\n`{e}`")
         context = {
