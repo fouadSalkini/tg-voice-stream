@@ -8,8 +8,8 @@ ydl_opts = {
     "outtmpl": "downloads/%(id)s.%(ext)s",
     'username': Config.YT_USERNAME,
     'password': Config.YT_PASSWORD,
-    'user_agent': Config.YT_USERAGENT,
-    'cookies': Config.YT_COOKIEFILE,
+    # 'user_agent': Config.YT_USERAGENT,
+    # 'cookies': Config.YT_COOKIEFILE,
 }
 
 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
