@@ -19,7 +19,7 @@ class YouTube:
         self.authconfig = {
             "username": Config.YT_USERNAME,
             "password": Config.YT_PASSWORD,
-            "cookiefile": Config.YT_COOKIEFILE,
+            "cookies": Config.YT_COOKIEFILE,
             "user_agent": Config.YT_USERAGENT
         }
         self.base = "https://www.youtube.com/watch?v="
