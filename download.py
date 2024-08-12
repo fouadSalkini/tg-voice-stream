@@ -8,6 +8,7 @@ ydl_opts = {
     'username': 'fouadsa91@gmail.com',
     'password': 'Fouad.salkini@91',
     'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'cookiefile': 'youtube.com_cookies.txt',
 }
 
 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
