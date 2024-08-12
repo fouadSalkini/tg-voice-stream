@@ -9,7 +9,7 @@ ydl_opts = {
     'username': Config.YT_USERNAME,
     'password': Config.YT_PASSWORD,
     'user_agent': Config.YT_USERAGENT,
-    'cookies': Config.YT_COOKIEFILE,
+    'cookiefile': Config.YT_COOKIEFILE,
 }
 
 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
