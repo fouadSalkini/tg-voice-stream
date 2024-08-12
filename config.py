@@ -6,6 +6,12 @@ from pyrogram import filters
 load_dotenv()
 
 class Config(object):
+    # youtube variables
+    YT_USERNAME = getenv("YT_USERNAME", None)               
+    YT_PASSWORD = getenv("YT_PASSWORD", None)               
+    YT_COOKIEFILE = getenv("YT_COOKIEFILE", None)  
+    YT_USERAGENT =  getenv("YT_USERAGENT", None)        
+
     # required config variables
     API_HASH = getenv("API_HASH", None)                # get from my.telegram.org
     API_ID = int(getenv("API_ID", 0))                  # get from my.telegram.org
