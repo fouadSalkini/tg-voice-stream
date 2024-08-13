@@ -25,8 +25,8 @@ id = int(Config.LOGGER_CHANNEL)
 print(id)
 
 # Start the client
-# with app:
-#     app.send_message(
-#         int(Config.LOGGER_CHANNEL), 
-#         "Hello, this is a message from Pyrogram!"
-#         )
+with app:
+    app.send_message(
+        int(Config.LOGGER_CHANNEL), 
+        "Hello, this is a message from Pyrogram!"
+        )
