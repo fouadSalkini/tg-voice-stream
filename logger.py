@@ -1,5 +1,6 @@
 from Music.core.clients import hellbot
 from config import Config
+from pyrogram import Client
 
 
 async def start():
@@ -9,4 +10,5 @@ async def start():
                     "hello"
                 )
 
+Client.restart()
 hellbot.run(start())
