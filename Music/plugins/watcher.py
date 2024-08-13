@@ -24,7 +24,7 @@ async def new_users(_, msg: Message):
     if not await db.is_user_exist(chat_id):
         BOT_USERNAME = hellbot.app.username
         await db.add_user(chat_id, user_name)
-        if Config.LOGGER_ID:
+        if Config.LOGGER_CHANNEL:
             await hellbot.logit(
                 "newuser",
                 f"**⤷ User:** {msg.from_user.mention(style='md')}\n**⤷ ID:** `{chat_id}`\n__⤷ Started @{BOT_USERNAME} !!__",
@@ -45,7 +45,7 @@ async def new_users(_, msg: Message):
     if not await db.is_chat_exist(chat_id):
         BOT_USERNAME = hellbot.app.username
         await db.add_chat(chat_id)
-        if Config.LOGGER_ID:
+        if Config.LOGGER_CHANNEL:
             await hellbot.logit(
                 "newchat",
                 f"**⤷ Chat Title:** {msg.chat.title} \n**⤷ Chat UN:** @{msg.chat.username or None}) \n**⤷ Chat ID:** `{chat_id}` \n__⤷ ADDED @{BOT_USERNAME} !!__",

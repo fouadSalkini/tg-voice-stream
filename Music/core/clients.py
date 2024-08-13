@@ -9,7 +9,7 @@ from .logger import LOGS
 class HellClient(Client):
     def __init__(self):
         self.app = Client(
-            "StreamingMusic",
+            name=Config.MUSIC_SESSION,
             api_id=Config.API_ID,
             api_hash=Config.API_HASH,
             bot_token=Config.BOT_TOKEN,
@@ -18,7 +18,7 @@ class HellClient(Client):
         )
 
         self.user = Client(
-            "StreamingClient",
+            name=Config.CLIENT_SESSION,
             api_id=Config.API_ID,
             api_hash=Config.API_HASH,
             session_string=Config.HELLBOT_SESSION,
@@ -55,11 +55,11 @@ class HellClient(Client):
         try:
             if file:
                 await self.app.send_document(
-                    Config.LOGGER_ID, file, caption=log_text
+                    Config.LOGGER_CHANNEL, file, caption=log_text
                 )
             else:
                 await self.app.send_message(
-                    Config.LOGGER_ID, log_text, disable_web_page_preview=True
+                    Config.LOGGER_CHANNEL, log_text, disable_web_page_preview=True
                 )
         except Exception as e:
             raise HellBotException(f"[HellBotException]: {e}")

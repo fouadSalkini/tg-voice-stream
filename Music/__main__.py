@@ -28,7 +28,7 @@ async def start_bot():
     try:
         if Config.BOT_PIC:
             await hellbot.app.send_photo(
-                int(Config.LOGGER_ID),
+                int(Config.LOGGER_CHANNEL),
                 Config.BOT_PIC,
                 TEXTS.BOOTED.format(
                     Config.BOT_NAME,
@@ -41,7 +41,7 @@ async def start_bot():
             )
         else:
             await hellbot.app.send_message(
-                int(Config.LOGGER_ID),
+                int(Config.LOGGER_CHANNEL),
                 TEXTS.BOOTED.format(
                     Config.BOT_NAME,
                     hmusic_version,
@@ -63,7 +63,7 @@ async def start_bot():
     await idle()
 
     await hellbot.app.send_message(
-        Config.LOGGER_ID,
+        Config.LOGGER_CHANNEL,
         f"\x23\x53\x54\x4f\x50\n\n**\x48\x65\x6c\x6c\x2d\x4d\x75\x73\x69\x63\x20\x5b{hmusic_version}\x5d\x20\x69\x73\x20\x6e\x6f\x77\x20\x6f\x66\x66\x6c\x69\x6e\x65\x21**",
     )
     LOGS.info(

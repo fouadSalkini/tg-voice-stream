@@ -18,8 +18,10 @@ class Config(object):
     BOT_TOKEN = getenv("BOT_TOKEN", None)              # get from @BotFather
     DATABASE_URL = getenv("DATABASE_URL", None)        # from https://cloud.mongodb.com/
     HELLBOT_SESSION = getenv("HELLBOT_SESSION", None)  # enter your session string here
-    LOGGER_ID = int(getenv("LOGGER_ID", 0))            # make a channel and get its ID
+    LOGGER_CHANNEL = int(getenv("LOGGER_CHANNEL", 0))            # make a channel and get its ID
     OWNER_ID = getenv("OWNER_ID", "")                  # enter your id here
+    MUSIC_SESSION = getenv("MUSIC_SESSION", None)  # enter your session name here
+    CLIENT_SESSION = getenv("CLIENT_SESSION", None)  # enter your session name here
 
     # optional config variables
     BLACK_IMG = getenv("BLACK_IMG", "https://www.trustedreviews.com/wp-content/uploads/sites/54/2018/01/Telegram-920x518.jpg")        # black image for progress

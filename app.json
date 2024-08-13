@@ -36,7 +36,7 @@
             "description": "Paste the mongodb url.",
             "value": ""
         },
-		"LOGGER_ID": {
+		"LOGGER_CHANNEL": {
 			"description": "Channel/group id to log error/info messages.",
 			"value": ""
 		},
