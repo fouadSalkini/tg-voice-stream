@@ -14,7 +14,11 @@ ydl_opts = {
     "outtmpl": "downloads/%(id)s.%(ext)s"
 }.update(authconfig)
 
+merged = ydl_opts.copy()  # Make a copy of arr1
+merged.update(authconfig) 
+
 print(ydl_opts)
+print(merged)
 
 # with yt_dlp.YoutubeDL(ydl_opts) as ydl:
 #     ydl.download([video_url])
