@@ -22,10 +22,14 @@ class YouTube:
             "cookies": Config.YT_COOKIEFILE,
             "user_agent": Config.YT_USERAGENT
         }
+
         self.base = "https://www.youtube.com/watch?v="
         self.listbase = "https://youtube.com/playlist?list="
         self.regex = r"(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/|youtube\.com\/playlist\?list=)"
-        self.audio_opts = {"format": "bestaudio[ext=m4a]"}.update(self.authconfig)
+        
+        self.audio_opts = {"format": "bestaudio[ext=m4a]"}
+        self.audio_opts.update(self.authconfig)
+
         self.video_opts = {
             "format": "best",
             "addmetadata": True,
@@ -39,7 +43,9 @@ class YouTube:
             "outtmpl": "%(id)s.mp4",
             "logtostderr": False,
             "quiet": True,
-        }.update(self.authconfig)
+        }
+        self.video_opts.update(self.authconfig)
+
         self.yt_opts_audio = {
             "format": "bestaudio/best",
             "outtmpl": "downloads/%(id)s.%(ext)s",
@@ -47,7 +53,9 @@ class YouTube:
             "nocheckcertificate": True,
             "quiet": True,
             "no_warnings": True,
-        }.update(self.authconfig)
+        }
+        self.yt_opts_audio.update(self.authconfig)
+
         self.yt_opts_video = {
             "format": "(bestvideo[height<=?720][width<=?1280][ext=mp4])+(bestaudio[ext=m4a])",
             "outtmpl": "downloads/%(id)s.%(ext)s",
@@ -55,10 +63,14 @@ class YouTube:
             "nocheckcertificate": True,
             "quiet": True,
             "no_warnings": True,
-        }.update(self.authconfig)
+        }
+        self.yt_opts_video.update(self.authconfig)
+
         self.yt_playlist_opts = {
             "exctract_flat": True,
-        }.update(self.authconfig)
+        }
+        self.yt_playlist_opts.update(self.authconfig)
+        
         self.lyrics = Config.LYRICS_API
         try:
             if self.lyrics:
