@@ -9,11 +9,11 @@ authconfig = {
             "cookies": Config.YT_COOKIEFILE,
             "user_agent": Config.YT_USERAGENT
         }
-ydl_opts = authconfig.copy().update({
+ydl_opts = {
     'format': 'best',
     "outtmpl": "downloads/%(id)s.%(ext)s"
-})
-
+}
+ydl_opts.update(authconfig)
 
 
 print(ydl_opts)
