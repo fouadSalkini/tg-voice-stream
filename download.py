@@ -12,7 +12,7 @@ authconfig = {
 ydl_opts = {
     'format': 'best',
     "outtmpl": "downloads/%(id)s.%(ext)s"
-}.update(authconfig)
+}
 
 merged = ydl_opts.copy()  # Make a copy of arr1
 merged.update(authconfig) 
