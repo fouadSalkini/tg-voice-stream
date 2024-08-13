@@ -6,10 +6,10 @@ video_url = 'https://www.youtube.com/watch?v=rCC70UbMuFY'
 ydl_opts = {
     'format': 'best',
     "outtmpl": "downloads/%(id)s.%(ext)s",
-    'username': 'auth2',
-    # 'password': Config.YT_PASSWORD,
-    # 'user_agent': Config.YT_USERAGENT,
-    # 'cookies': Config.YT_COOKIEFILE,
+    'username': Config.YT_USERNAME,
+    'password': Config.YT_PASSWORD,
+    'user_agent': Config.YT_USERAGENT,
+    'cookiefile': Config.YT_COOKIEFILE,
 }
 
 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
