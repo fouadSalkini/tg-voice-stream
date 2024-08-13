@@ -27,7 +27,6 @@ async def start_bot():
 
     try:
         if Config.BOT_PIC:
-            print(Config.LOGGER_ID)
             await hellbot.app.send_photo(
                 int(Config.LOGGER_ID),
                 Config.BOT_PIC,
