@@ -14,5 +14,7 @@ ydl_opts = {
     "outtmpl": "downloads/%(id)s.%(ext)s"
 }.update(authconfig)
 
+print(ydl_opts)
+
 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
     ydl.download([video_url])
