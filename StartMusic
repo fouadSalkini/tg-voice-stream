@@ -2,4 +2,4 @@
 # This script is used to start the music player
 
 # Start the music player
-nvm use 18 && python3 -m Music
+source ~/.nvm/nvm.sh && nvm use 18 && python3 -m Music
