@@ -9,4 +9,4 @@ async def start():
                     "hello"
                 )
 
-start()
+hellbot.run(start())
