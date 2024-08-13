@@ -16,7 +16,5 @@ ydl_opts = {
 ydl_opts.update(authconfig)
 
 
-print(ydl_opts)
-
-# with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-#     ydl.download([video_url])
+with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+    ydl.download([video_url])
