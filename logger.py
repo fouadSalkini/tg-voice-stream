@@ -13,7 +13,7 @@ session_name = Config.MUSIC_SESSION
 print(Config.MUSIC_SESSION)
 # Initialize the client
 app = Client(
-    name=Config.MUSIC_SESSION,
+    name=Config.CLIENT_SESSION,
     api_id=Config.API_ID,
     api_hash=Config.API_HASH,
     bot_token=Config.BOT_TOKEN,
