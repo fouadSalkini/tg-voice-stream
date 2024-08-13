@@ -10,5 +10,4 @@ async def start():
                     "hello"
                 )
 
-Client.restart()
 hellbot.run(start())

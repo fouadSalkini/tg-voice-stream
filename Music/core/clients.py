@@ -9,7 +9,7 @@ from .logger import LOGS
 class HellClient(Client):
     def __init__(self):
         self.app = Client(
-            "HellMusic",
+            "StreamingMusic",
             api_id=Config.API_ID,
             api_hash=Config.API_HASH,
             bot_token=Config.BOT_TOKEN,
@@ -18,7 +18,7 @@ class HellClient(Client):
         )
 
         self.user = Client(
-            "HellClient",
+            "StreamingClient",
             api_id=Config.API_ID,
             api_hash=Config.API_HASH,
             session_string=Config.HELLBOT_SESSION,
