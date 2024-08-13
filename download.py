@@ -9,16 +9,14 @@ authconfig = {
             "cookies": Config.YT_COOKIEFILE,
             "user_agent": Config.YT_USERAGENT
         }
-ydl_opts = {
+ydl_opts = authconfig.copy().update({
     'format': 'best',
     "outtmpl": "downloads/%(id)s.%(ext)s"
-}
+})
 
-merged = ydl_opts.copy()  # Make a copy of arr1
-merged.update(authconfig) 
+
 
 print(ydl_opts)
-print(merged)
 
 # with yt_dlp.YoutubeDL(ydl_opts) as ydl:
 #     ydl.download([video_url])
