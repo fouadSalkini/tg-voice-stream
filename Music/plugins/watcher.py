@@ -166,6 +166,7 @@ async def leaderboard():
 hrs = leaders.get_hrs()
 min = leaders.get_min()
 
-scheduler = AsyncIOScheduler()
-scheduler.add_job(leaderboard, "cron", hour=hrs, minute=min, timezone=Config.TZ)
-scheduler.start()
+# disabled leaderoard
+# scheduler = AsyncIOScheduler()
+# scheduler.add_job(leaderboard, "cron", hour=hrs, minute=min, timezone=Config.TZ)
+# scheduler.start()
