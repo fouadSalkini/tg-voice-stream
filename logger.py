@@ -21,12 +21,12 @@ app = Client(
     workers=100,
     )
 
-id = int(Config.LOGGER_CHANNEL)
+id = -1002225595080
 print(id)
 
 # Start the client
 with app:
     app.send_message(
-        int(Config.LOGGER_CHANNEL), 
+        id, 
         "Hello, this is a message from Pyrogram!"
         )
