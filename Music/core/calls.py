@@ -292,7 +292,7 @@ class HellMusic(PyTgCalls):
                 or get.status == ChatMemberStatus.BANNED
             ):
                 raise UserException(
-                    f"[UserException]:user: {hellbot.user.id}, bot: {hellbot.app.id} Assistant is restricted or banned in chat {chat_id}"
+                    f"[UserException]: data: {get},  user: {hellbot.user.id}, bot: {hellbot.app.id} Assistant is restricted or banned in chat {chat_id}"
                 )
         except UserNotParticipant:
             chat = await hellbot.app.get_chat(chat_id)
