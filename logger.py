@@ -21,7 +21,7 @@ app = Client(
     #workers=100,
     )
 
-id = int(Config.LOGGER_CHANNEL)
+id = -1002149851342  
 print(id)
 
 # Start the client
