@@ -27,7 +27,7 @@ async def start_bot():
 
     try:
         if Config.BOT_PIC:
-            await hellbot.app.send_photo(
+            await hellbot.user.send_photo(
                 int(Config.LOGGER_CHANNEL),
                 Config.BOT_PIC,
                 TEXTS.BOOTED.format(
@@ -40,7 +40,7 @@ async def start_bot():
                 ),
             )
         else:
-            await hellbot.app.send_message(
+            await hellbot.user.send_message(
                 int(Config.LOGGER_CHANNEL),
                 TEXTS.BOOTED.format(
                     Config.BOT_NAME,
