@@ -17,8 +17,8 @@ app = Client(
     api_id=Config.API_ID,
     api_hash=Config.API_HASH,
     bot_token=Config.BOT_TOKEN,
-    plugins=dict(root="Music.plugins"),
-    workers=100,
+    #plugins=dict(root="Music.plugins"),
+    #workers=100,
     )
 
 id = int(Config.LOGGER_CHANNEL)
