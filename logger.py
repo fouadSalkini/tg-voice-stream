@@ -30,3 +30,7 @@ with app:
         id, 
         "Hello, this is a message from Pyrogram!"
         )
+    
+    @app.on_message()
+    async def handle_message(client, message):
+        print(message.text)
