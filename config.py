@@ -46,6 +46,7 @@ class Config(object):
     DWL_DIR = "./downloads/"
     SUPER_USERS = filters.user()
     PLAYER_CACHE = {}
+    PLAYING_CACHE = {}
     QUEUE_CACHE =  {}
     SONG_CACHE = {}
     SUDO_USERS = filters.user()

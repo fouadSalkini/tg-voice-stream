@@ -3,7 +3,7 @@ import datetime
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pyrogram import filters
-from pyrogram.types import Message
+from pyrogram.types import InlineKeyboardMarkup, Message
 from pytgcalls.types import JoinedGroupCallParticipant, LeftGroupCallParticipant, Update
 from pytgcalls.types.stream import StreamAudioEnded
 
@@ -15,6 +15,9 @@ from Music.core.logger import LOGS
 from Music.helpers.buttons import Buttons
 from Music.utils.leaderboard import leaders
 from Music.utils.queue import Queue
+from Music.helpers.strings import TEXTS
+
+
 
 
 @hellbot.app.on_message(filters.private, group=2)
@@ -120,11 +123,33 @@ async def update_played():
             if que == []:
                 continue
             Queue.update_duration(chat_id, 1, 1)
-            played = Queue.get_played(chat_id)
-            await hellbot.logit(
-                    f"progress: {played}",
-                    f"",
+
+            # update progress in chat
+            try:
+                played = Queue.get_played(chat_id)
+                title = Queue.get_title(chat_id)
+                duration = Queue.get_duration(chat_id)
+                user = Queue.get_user(chat_id)
+
+                sent = Config.PLAYING_CACHE[chat_id]["sent"]
+                btns = Config.PLAYING_CACHE[chat_id]["btns"]
+                
+                await sent.edit_text(
+                    TEXTS.PLAYING2.format(
+                        hellbot.app.mention,
+                        title,
+                        duration,
+                        user,
+                        played
+                    ),
+                    reply_markup=InlineKeyboardMarkup(btns)
                 )
+            except Exception as e:
+                await hellbot.logit(
+                    f"progress error",
+                    f"{str(e)}",
+                )
+                
 
 
 asyncio.create_task(update_played())
