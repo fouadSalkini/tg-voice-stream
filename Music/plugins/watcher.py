@@ -134,20 +134,20 @@ async def update_played():
                 sent = Config.PLAYING_CACHE[chat_id]["sent"]
                 btns = Config.PLAYING_CACHE[chat_id]["btns"]
                 
-                await sent.edit_text(
-                    TEXTS.PLAYING2.format(
-                        hellbot.app.mention,
-                        title,
-                        duration,
-                        user,
-                        played
-                    ),
-                    reply_markup=InlineKeyboardMarkup(btns)
-                )
+                # await sent.edit_text(
+                #     TEXTS.PLAYING2.format(
+                #         hellbot.app.mention,
+                #         title,
+                #         duration,
+                #         user,
+                #         played
+                #     ),
+                #     reply_markup=InlineKeyboardMarkup(btns)
+                # )
             except Exception as e:
                 await hellbot.logit(
-                    f"progress error",
-                    f"{str(e)}",
+                    f"progress error1 {str(e)}",
+                    f"",
                 )
                 
 
