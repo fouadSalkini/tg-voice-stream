@@ -120,8 +120,9 @@ async def update_played():
             if que == []:
                 continue
             Queue.update_duration(chat_id, 1, 1)
+            played = Queue.get_played(chat_id)
             await hellbot.logit(
-                    f"progress: {chat_id}",
+                    f"progress: {played}",
                     f"",
                 )
 

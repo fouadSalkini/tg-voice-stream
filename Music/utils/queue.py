@@ -77,6 +77,14 @@ class QueueDB:
             return None
         except IndexError:
             return None
+        
+    def get_played(self, chat_id: int):
+        try:
+            return self.queue[chat_id][0]["played"]
+        except KeyError:
+            return None
+        except IndexError:
+            return None
 
     def update_duration(self, chat_id: int, seek_type: int, time: int):
         try:
