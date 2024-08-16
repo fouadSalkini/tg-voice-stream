@@ -105,7 +105,7 @@ class Player:
                 os.remove(photo)
                 return
             btns = Buttons.player_markup(chat_id, video_id, hellbot.app.username)
-            Config.PLAYING_CACHE[chat_id]['btns'] = btns
+            # Config.PLAYING_CACHE[chat_id]['btns'] = btns
             if photo:
                 sent = await hellbot.app.send_photo(
                     chat_id,
@@ -200,7 +200,7 @@ class Player:
             os.remove(photo)
             return
         btns = Buttons.player_markup(chat_id, que["video_id"], hellbot.app.username)
-        Config.PLAYING_CACHE[chat_id]['btns'] = btns
+        # Config.PLAYING_CACHE[chat_id]['btns'] = btns
         if photo:
             sent = await hellbot.app.send_photo(
                 chat_id,

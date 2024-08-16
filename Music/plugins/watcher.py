@@ -125,14 +125,14 @@ async def update_played():
             Queue.update_duration(chat_id, 1, 1)
 
             # update progress in chat
-            try:
-                played = Queue.get_played(chat_id)
-                title = Queue.get_title(chat_id)
-                duration = Queue.get_duration(chat_id)
-                user = Queue.get_user(chat_id)
+            # try:
+            # played = Queue.get_played(chat_id)
+            # title = Queue.get_title(chat_id)
+            # duration = Queue.get_duration(chat_id)
+            # user = Queue.get_user(chat_id)
 
-                sent = Config.PLAYING_CACHE[chat_id]["sent"]
-                btns = Config.PLAYING_CACHE[chat_id]["btns"]
+            # sent = Config.PLAYING_CACHE[chat_id]["sent"]
+            # btns = Config.PLAYING_CACHE[chat_id]["btns"]
                 
                 # await sent.edit_text(
                 #     TEXTS.PLAYING2.format(
@@ -144,11 +144,11 @@ async def update_played():
                 #     ),
                 #     reply_markup=InlineKeyboardMarkup(btns)
                 # )
-            except Exception as e:
-                await hellbot.logit(
-                    f"progress error1 {str(e)}",
-                    f"",
-                )
+            # except Exception as e:
+            #     await hellbot.logit(
+            #         f"progress error1 {str(e)}",
+            #         f"",
+            #     )
                 
 
 
