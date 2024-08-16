@@ -133,18 +133,18 @@ class Player:
                     ),
                     reply_markup=InlineKeyboardMarkup(btns),
                 )
-                await sent.edit_text(
-                    TEXTS.PLAYING2.format(
-                        hellbot.app.mention,
-                        title,
-                        duration,
-                        user,
-                        "1:05"
-                    ),
-                    reply_markup=InlineKeyboardMarkup(btns)
-                )
+                # await sent.edit_text(
+                #     TEXTS.PLAYING2.format(
+                #         hellbot.app.mention,
+                #         title,
+                #         duration,
+                #         user,
+                #         "1:05"
+                #     ),
+                #     reply_markup=InlineKeyboardMarkup(btns)
+                # )
                 await hellbot.logit(
-                    f"play 22",
+                    f"play 23",
                     f"",
                 )
                 

@@ -120,6 +120,10 @@ async def update_played():
             if que == []:
                 continue
             Queue.update_duration(chat_id, 1, 1)
+            await hellbot.logit(
+                    f"progress: {chat_id}",
+                    f"",
+                )
 
 
 asyncio.create_task(update_played())
