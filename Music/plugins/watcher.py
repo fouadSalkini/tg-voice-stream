@@ -130,20 +130,20 @@ async def update_played():
             # title = Queue.get_title(chat_id)
             # duration = Queue.get_duration(chat_id)
             # user = Queue.get_user(chat_id)
-
-            # sent = Config.PLAYING_CACHE[chat_id]["sent"]
-            # btns = Config.PLAYING_CACHE[chat_id]["btns"]
+            # sent = Config.PLAYER_CACHE[chat_id]
+            # btns = Config.BTNS_CACHE[chat_id]
+            # LOGS.info(f"#\nplayed: {played} \ntitle: {title} \ntitle: {duration} \ntitle: {user}")
                 
-                # await sent.edit_text(
-                #     TEXTS.PLAYING2.format(
-                #         hellbot.app.mention,
-                #         title,
-                #         duration,
-                #         user,
-                #         played
-                #     ),
-                #     reply_markup=InlineKeyboardMarkup(btns)
-                # )
+            # await sent.edit_text(
+            #     TEXTS.PLAYING2.format(
+            #         hellbot.app.mention,
+            #         title,
+            #         duration,
+            #         user,
+            #         played
+            #     ),
+            #     reply_markup=InlineKeyboardMarkup(btns)
+            # )
             # except Exception as e:
             #     await hellbot.logit(
             #         f"progress error1 {str(e)}",

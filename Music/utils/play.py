@@ -146,7 +146,7 @@ class Player:
                 except Exception:
                     pass
             Config.PLAYER_CACHE[chat_id] = sent
-            Config.PLAYING_CACHE[chat_id]['sent'] = sent
+            Config.BTNS_CACHE[chat_id] = btns
         else:
             sent = await hellbot.app.send_message(
                 chat_id,
@@ -240,7 +240,7 @@ class Player:
             except Exception:
                 pass
         Config.PLAYER_CACHE[chat_id] = sent
-        Config.PLAYING_CACHE[chat_id]['sent'] = sent
+        Config.BTNS_CACHE[chat_id] = btns
         await message.delete()
 
     async def playlist(
