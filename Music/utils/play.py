@@ -129,6 +129,16 @@ class Player:
                     ),
                     reply_markup=InlineKeyboardMarkup(btns),
                 )
+                sent.edit_text(
+                    TEXTS.PLAYING2.format(
+                        hellbot.app.mention,
+                        title,
+                        duration,
+                        user,
+                        "1:05"
+                    ),
+                    reply_markup=InlineKeyboardMarkup(btns)
+                )
             previous = Config.PLAYER_CACHE.get(chat_id)
             if previous:
                 try:
