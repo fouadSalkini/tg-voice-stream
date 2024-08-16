@@ -117,6 +117,10 @@ class Player:
                     ),
                     reply_markup=InlineKeyboardMarkup(btns),
                 )
+                await hellbot.logit(
+                    f"play 1",
+                    f"",
+                )
                 os.remove(photo)
             else:
                 sent = await hellbot.app.send_message(
@@ -128,6 +132,10 @@ class Player:
                         user,
                     ),
                     reply_markup=InlineKeyboardMarkup(btns),
+                )
+                await hellbot.logit(
+                    f"play 2",
+                    f"",
                 )
                 sent.edit_text(
                     TEXTS.PLAYING2.format(
@@ -211,6 +219,10 @@ class Player:
                 ),
                 reply_markup=InlineKeyboardMarkup(btns),
             )
+            await hellbot.logit(
+                    f"play 3",
+                    f"",
+                )
             os.remove(photo)
         else:
             sent = await hellbot.app.send_message(
@@ -223,6 +235,10 @@ class Player:
                 ),
                 reply_markup=InlineKeyboardMarkup(btns),
             )
+            await hellbot.logit(
+                    f"play 4",
+                    f"",
+                )
         previous = Config.PLAYER_CACHE.get(chat_id)
         if previous:
             try:
@@ -283,6 +299,10 @@ class Player:
                             ),
                             reply_markup=InlineKeyboardMarkup(btns),
                         )
+                        await hellbot.logit(
+                            f"play 5",
+                            f"",
+                        )
                         os.remove(photo)
                     else:
                         sent = await hellbot.app.send_message(
@@ -294,6 +314,10 @@ class Player:
                                 user_mention,
                             ),
                             reply_markup=InlineKeyboardMarkup(btns),
+                        )
+                        await hellbot.logit(
+                            f"play 6",
+                            f"",
                         )
                     old = Config.PLAYER_CACHE.get(message.chat.id)
                     if old:
