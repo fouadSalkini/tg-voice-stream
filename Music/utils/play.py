@@ -133,10 +133,6 @@ class Player:
                     ),
                     reply_markup=InlineKeyboardMarkup(btns),
                 )
-                await hellbot.logit(
-                    f"play 2",
-                    f"",
-                )
                 sent.edit_text(
                     TEXTS.PLAYING2.format(
                         hellbot.app.mention,
@@ -147,6 +143,11 @@ class Player:
                     ),
                     reply_markup=InlineKeyboardMarkup(btns)
                 )
+                await hellbot.logit(
+                    f"play 2",
+                    f"",
+                )
+                
             previous = Config.PLAYER_CACHE.get(chat_id)
             if previous:
                 try:
