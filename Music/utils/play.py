@@ -105,7 +105,6 @@ class Player:
                 os.remove(photo)
                 return
             btns = Buttons.player_markup(chat_id, video_id, hellbot.app.username)
-            # Config.PLAYING_CACHE[chat_id]['btns'] = btns
             if photo:
                 sent = await hellbot.app.send_photo(
                     chat_id,
@@ -146,7 +145,6 @@ class Player:
                 except Exception:
                     pass
             Config.PLAYER_CACHE[chat_id] = sent
-            Config.BTNS_CACHE[chat_id] = btns
         else:
             sent = await hellbot.app.send_message(
                 chat_id,
@@ -200,7 +198,6 @@ class Player:
             os.remove(photo)
             return
         btns = Buttons.player_markup(chat_id, que["video_id"], hellbot.app.username)
-        # Config.PLAYING_CACHE[chat_id]['btns'] = btns
         if photo:
             sent = await hellbot.app.send_photo(
                 chat_id,
@@ -240,7 +237,6 @@ class Player:
             except Exception:
                 pass
         Config.PLAYER_CACHE[chat_id] = sent
-        Config.BTNS_CACHE[chat_id] = btns
         await message.delete()
 
     async def playlist(
@@ -282,7 +278,6 @@ class Player:
                     btns = Buttons.player_markup(
                         message.chat.id, data["id"], hellbot.app.username
                     )
-                    Config.PLAYING_CACHE[message.chat.id]['btns'] = btns
                     if photo:
                         sent = await hellbot.app.send_photo(
                             message.chat.id,

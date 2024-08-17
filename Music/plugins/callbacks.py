@@ -13,6 +13,7 @@ from Music.utils.play import player
 from Music.utils.queue import Queue
 from Music.utils.youtube import ytube
 from Music.core.logger import LOGS
+import json
 
 
 
@@ -31,6 +32,7 @@ async def controls_cb(_, cb: CallbackQuery):
     chat_id = int(cb.data.split("|")[2])
     btns = Buttons.controls_markup(video_id, chat_id)
     try:
+        Config.CONTROLS_CACHE[int(chat_id)] = True
         await cb.message.edit_reply_markup(InlineKeyboardMarkup(btns))
     except:
         return
@@ -40,6 +42,7 @@ async def controls_cb(_, cb: CallbackQuery):
 async def player_cb(_, cb: CallbackQuery):
     _, video_id, chat_id = cb.data.split("|")
     btns = Buttons.player_markup(chat_id, video_id, hellbot.app.username)
+    Config.CONTROLS_CACHE[int(chat_id)] = False
     try:
         await cb.message.edit_reply_markup(InlineKeyboardMarkup(btns))
     except:
@@ -209,11 +212,11 @@ async def controler_cb(_, cb: CallbackQuery):
             return await cb.answer("No songs in queue to get position!", show_alert=True)
         played = int(que[0]["played"])
         duration = formatter.mins_to_secs(que[0]["duration"])
-        try:
-            btns = Buttons.controls_markup_with_pos(video_id, chat_id, played)
-            await cb.message.edit_reply_markup(InlineKeyboardMarkup(btns))
-        except Exception as e:
-            return await cb.answer(f"Something went wrong! {str(e)}", show_alert=True)
+        # try:
+        #     btns = Buttons.controls_markup_with_pos(video_id, chat_id, played)
+        #     await cb.message.edit_reply_markup(InlineKeyboardMarkup(btns))
+        # except Exception as e:
+        #     return await cb.answer(f"Something went wrong! {str(e)}", show_alert=True)
     elif action == "nothing":
         que = Queue.get_queue(cb.message.chat.id)
         if que == []:

@@ -127,8 +127,37 @@ class MakeButtons:
             buttons = [
                 [
                     self.ikb("🎛️", callback_data=f"controls|{video_id}|{chat_id}"),
-                    self.ikb("🗑", callback_data="close"),
-                ]
+                    # self.ikb("🗑", callback_data="close"),
+                ],
+            ]
+        else:
+            buttons = [
+                [
+                    self.ikb("About Song", url=f"https://t.me/{username}?start=song_{video_id}"),
+                ],
+                [
+                    self.ikb("❤️", callback_data=f"add_favorite|{video_id}"),
+                    self.ikb("🎛️", callback_data=f"controls|{video_id}|{chat_id}"),
+                ],
+                # [
+                #     self.ikb("🗑", callback_data="close"),
+                # ],
+            ]
+        return buttons
+    
+    def player_markup_with_pos(self, chat_id, video_id, username, played, duration):
+
+        formated_time = self.seconds_to_hh_mm_ss(played)
+
+        if video_id == "telegram":
+            buttons = [
+                [
+                    self.ikb("🎛️", callback_data=f"controls|{video_id}|{chat_id}"),
+                    # self.ikb("🗑", callback_data="close"),
+                ],
+                [
+                    self.ikb(text=f"{formated_time}", callback_data=f"ctrl|position|{video_id}|{chat_id}"),
+                ],
             ]
         else:
             buttons = [
@@ -140,7 +169,8 @@ class MakeButtons:
                     self.ikb("🎛️", callback_data=f"controls|{video_id}|{chat_id}"),
                 ],
                 [
-                    self.ikb("🗑", callback_data="close"),
+                    # self.ikb("🗑", callback_data="close"),
+                    self.ikb(text=f"{formated_time}", callback_data=f"ctrl|position|{video_id}|{chat_id}"),
                 ],
             ]
         return buttons
@@ -167,41 +197,11 @@ class MakeButtons:
             # ],
             [
                 self.ikb(text="🔙", callback_data=f"player|{video_id}|{chat_id}"),
-                self.ikb(text="🗑", callback_data="close"),
+                # self.ikb(text="🗑", callback_data="close"),
             ],
         ]
         return buttons
     
-    def controls_markup_with_pos(self, video_id, chat_id, played = None, duration = None):
-
-        formated_time = self.seconds_to_hh_mm_ss(played)
-
-        buttons = [
-            [
-                self.ikb(text="⟲ 10s", callback_data=f"ctrl|bseek|{video_id}|{chat_id}"),
-                self.ikb(text="⦿ Play/Pause", callback_data=f"ctrl|play|{video_id}|{chat_id}"),
-                self.ikb(text="⟳ 10s", callback_data=f"ctrl|fseek|{video_id}|{chat_id}"),
-            ],
-            [
-                self.ikb(text="⊡ End", callback_data=f"ctrl|end|{video_id}|{chat_id}"),
-                self.ikb(text="↻ Replay", callback_data=f"ctrl|replay|{video_id}|{chat_id}"),
-                self.ikb(text="∞ Loop", callback_data=f"ctrl|loop|{video_id}|{chat_id}"),
-            ],
-            [
-                self.ikb(text="⊝ Mute", callback_data=f"ctrl|mute|{video_id}|{chat_id}"),
-                self.ikb(text="⊜ Unmute", callback_data=f"ctrl|unmute|{video_id}|{chat_id}"),
-                self.ikb(text="⊹ Skip", callback_data=f"ctrl|skip|{video_id}|{chat_id}"),
-            ],
-            [
-                # self.ikb(text=f"{duration} - {formated_time}", callback_data=f"ctrl|position|{video_id}|{chat_id}"),
-                self.ikb(text=f"{formated_time}", callback_data=f"ctrl|position|{video_id}|{chat_id}"),
-            ],
-            [
-                self.ikb(text="🔙", callback_data=f"player|{video_id}|{chat_id}"),
-                self.ikb(text="🗑", callback_data="close"),
-            ],
-        ]
-        return buttons
     
     def seconds_to_hh_mm_ss(self, seconds):
         return time.strftime('%H:%M:%S', time.gmtime(seconds))

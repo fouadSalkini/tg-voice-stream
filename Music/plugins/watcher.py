@@ -138,6 +138,9 @@ async def update_position():
             is_paused = await db.get_watcher(chat_id, "pause")
             if is_paused:
                 continue
+            controls_active = (chat_id in Config.CONTROLS_CACHE and Config.CONTROLS_CACHE[chat_id] is True)
+            if controls_active:
+                continue
             que = Queue.get_queue(chat_id)
             if que == []:
                 continue
@@ -145,12 +148,12 @@ async def update_position():
             # update progress in chat
             try:
                 played = int(que[0]["played"])
-                duration = Queue.get_duration(chat_id)
-                video_id = Queue.get_video_id(chat_id)
+                duration = que[0]["duration"]
+                video_id = que[0]["video_id"]
                 sent = Config.PLAYER_CACHE[chat_id]
                 # LOGS.info(f"#\nplayed: {played} \nduration: {duration}")
                     
-                btns = Buttons.controls_markup_with_pos(video_id, chat_id, played, duration)
+                btns = Buttons.player_markup_with_pos(chat_id, video_id, hellbot.app.username, played, duration)
                 await sent.edit_reply_markup(InlineKeyboardMarkup(btns))
             except Exception as e:
                 LOGS.info(f"exception is: {str(e)}")

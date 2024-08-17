@@ -16,6 +16,8 @@ from Music.utils.play import player
 from Music.utils.queue import Queue
 from Music.utils.thumbnail import thumb
 from Music.utils.youtube import ytube
+from Music.core.logger import LOGS
+
 
 
 @hellbot.app.on_message(
