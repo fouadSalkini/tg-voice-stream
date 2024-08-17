@@ -124,35 +124,43 @@ async def update_played():
                 continue
             Queue.update_duration(chat_id, 1, 1)
 
-            # update progress in chat
-            # try:
-            # played = Queue.get_played(chat_id)
-            # title = Queue.get_title(chat_id)
-            # duration = Queue.get_duration(chat_id)
-            # user = Queue.get_user(chat_id)
-            # sent = Config.PLAYER_CACHE[chat_id]
-            # btns = Config.BTNS_CACHE[chat_id]
-            # LOGS.info(f"#\nplayed: {played} \ntitle: {title} \ntitle: {duration} \ntitle: {user}")
+            # played = int(que[0]["played"])
+            # LOGS.info(f"#played: {played}")
                 
-            # await sent.edit_text(
-            #     TEXTS.PLAYING2.format(
-            #         hellbot.app.mention,
-            #         title,
-            #         duration,
-            #         user,
-            #         played
-            #     ),
-            #     reply_markup=InlineKeyboardMarkup(btns)
-            # )
-            # except Exception as e:
-            #     await hellbot.logit(
-            #         f"progress error1 {str(e)}",
-            #         f"",
-            #     )
+
+async def update_position():
+    while not await asyncio.sleep(5):
+        active_chats = await db.get_active_vc()
+        for x in active_chats:
+            chat_id = int(x["chat_id"])
+            if chat_id == 0:
+                continue
+            is_paused = await db.get_watcher(chat_id, "pause")
+            if is_paused:
+                continue
+            que = Queue.get_queue(chat_id)
+            if que == []:
+                continue
+
+            # update progress in chat
+            try:
+                played = int(que[0]["played"])
+                duration = Queue.get_duration(chat_id)
+                video_id = Queue.get_video_id(chat_id)
+                sent = Config.PLAYER_CACHE[chat_id]
+                # LOGS.info(f"#\nplayed: {played} \nduration: {duration}")
+                    
+                btns = Buttons.controls_markup_with_pos(video_id, chat_id, played, duration)
+                await sent.edit_reply_markup(InlineKeyboardMarkup(btns))
+            except Exception as e:
+                LOGS.info(f"exception is: {str(e)}")
+            
+           
                 
 
 
 asyncio.create_task(update_played())
+asyncio.create_task(update_position())
 
 
 async def end_inactive_vc():

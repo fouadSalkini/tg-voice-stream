@@ -205,6 +205,6 @@ async def seek(_, message: Message):
     except:
         return await hell.edit_text("Something went wrong!")
     Queue.update_duration(message.chat.id, seek_type, seek_time)
-    await hell.edit_text(
-        f"Seeked `{seek_time}` seconds {'forward' if seek_type == 1 else 'backward'}!"
-    )
+    # await hell.edit_text(
+    #     f"Seeked `{seek_time}` seconds {'forward' if seek_type == 1 else 'backward'}!"
+    # )

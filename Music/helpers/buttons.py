@@ -1,5 +1,5 @@
 from pyrogram.types import InlineKeyboardButton
-
+import time
 
 class MakeButtons:
     def __init__(self):
@@ -148,19 +148,53 @@ class MakeButtons:
     def controls_markup(self, video_id, chat_id):
         buttons = [
             [
-                self.ikb(text="⟲", callback_data=f"ctrl|bseek|{chat_id}"),
-                self.ikb(text="⦿", callback_data=f"ctrl|play|{chat_id}"),
-                self.ikb(text="⟳", callback_data=f"ctrl|fseek|{chat_id}"),
+                self.ikb(text="⟲ 10s", callback_data=f"ctrl|bseek|{video_id}|{chat_id}"),
+                self.ikb(text="⦿ Play/Pause", callback_data=f"ctrl|play|{video_id}|{chat_id}"),
+                self.ikb(text="⟳ 10s", callback_data=f"ctrl|fseek|{video_id}|{chat_id}"),
             ],
             [
-                self.ikb(text="⊡ End", callback_data=f"ctrl|end|{chat_id}"),
-                self.ikb(text="↻ Replay", callback_data=f"ctrl|replay|{chat_id}"),
-                self.ikb(text="∞ Loop", callback_data=f"ctrl|loop|{chat_id}"),
+                self.ikb(text="⊡ End", callback_data=f"ctrl|end|{video_id}|{chat_id}"),
+                self.ikb(text="↻ Replay", callback_data=f"ctrl|replay|{video_id}|{chat_id}"),
+                self.ikb(text="∞ Loop", callback_data=f"ctrl|loop|{video_id}|{chat_id}"),
             ],
             [
-                self.ikb(text="⊝ Mute", callback_data=f"ctrl|mute|{chat_id}"),
-                self.ikb(text="⊜ Unmute", callback_data=f"ctrl|unmute|{chat_id}"),
-                self.ikb(text="⊹ Skip", callback_data=f"ctrl|skip|{chat_id}"),
+                self.ikb(text="⊝ Mute", callback_data=f"ctrl|mute|{video_id}|{chat_id}"),
+                self.ikb(text="⊜ Unmute", callback_data=f"ctrl|unmute|{video_id}|{chat_id}"),
+                self.ikb(text="⊹ Skip", callback_data=f"ctrl|skip|{video_id}|{chat_id}"),
+            ],
+            # [
+            #     self.ikb(text="Position", callback_data=f"ctrl|position|{video_id}|{chat_id}"),
+            # ],
+            [
+                self.ikb(text="🔙", callback_data=f"player|{video_id}|{chat_id}"),
+                self.ikb(text="🗑", callback_data="close"),
+            ],
+        ]
+        return buttons
+    
+    def controls_markup_with_pos(self, video_id, chat_id, played = None, duration = None):
+
+        formated_time = self.seconds_to_hh_mm_ss(played)
+
+        buttons = [
+            [
+                self.ikb(text="⟲ 10s", callback_data=f"ctrl|bseek|{video_id}|{chat_id}"),
+                self.ikb(text="⦿ Play/Pause", callback_data=f"ctrl|play|{video_id}|{chat_id}"),
+                self.ikb(text="⟳ 10s", callback_data=f"ctrl|fseek|{video_id}|{chat_id}"),
+            ],
+            [
+                self.ikb(text="⊡ End", callback_data=f"ctrl|end|{video_id}|{chat_id}"),
+                self.ikb(text="↻ Replay", callback_data=f"ctrl|replay|{video_id}|{chat_id}"),
+                self.ikb(text="∞ Loop", callback_data=f"ctrl|loop|{video_id}|{chat_id}"),
+            ],
+            [
+                self.ikb(text="⊝ Mute", callback_data=f"ctrl|mute|{video_id}|{chat_id}"),
+                self.ikb(text="⊜ Unmute", callback_data=f"ctrl|unmute|{video_id}|{chat_id}"),
+                self.ikb(text="⊹ Skip", callback_data=f"ctrl|skip|{video_id}|{chat_id}"),
+            ],
+            [
+                # self.ikb(text=f"{duration} - {formated_time}", callback_data=f"ctrl|position|{video_id}|{chat_id}"),
+                self.ikb(text=f"{formated_time}", callback_data=f"ctrl|position|{video_id}|{chat_id}"),
             ],
             [
                 self.ikb(text="🔙", callback_data=f"player|{video_id}|{chat_id}"),
@@ -168,6 +202,9 @@ class MakeButtons:
             ],
         ]
         return buttons
+    
+    def seconds_to_hh_mm_ss(self, seconds):
+        return time.strftime('%H:%M:%S', time.gmtime(seconds))
 
     def song_markup(self, rand_key, url, key):
         buttons = [

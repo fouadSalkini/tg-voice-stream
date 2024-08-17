@@ -12,6 +12,8 @@ from Music.utils.admins import get_auth_users
 from Music.utils.play import player
 from Music.utils.queue import Queue
 from Music.utils.youtube import ytube
+from Music.core.logger import LOGS
+
 
 
 @hellbot.app.on_callback_query(filters.regex(r"close") & ~Config.BANNED_USERS)
@@ -46,7 +48,7 @@ async def player_cb(_, cb: CallbackQuery):
 
 @hellbot.app.on_callback_query(filters.regex(r"ctrl") & ~Config.BANNED_USERS)
 async def controler_cb(_, cb: CallbackQuery):
-    _, action, chat_id = cb.data.split("|")
+    _, action, video_id, chat_id = cb.data.split("|")
     if int(chat_id) != cb.message.chat.id:
         return await cb.answer("This message is not for this chat!", show_alert=True)
     is_active = await db.is_active_vc(int(chat_id))
@@ -171,7 +173,7 @@ async def controler_cb(_, cb: CallbackQuery):
             await hellmusic.seek_vc(context)
         except:
             return await cb.answer("Something went wrong!", show_alert=True)
-        Queue.update_duration(cb.message.chat.id, 0, to_seek)
+        Queue.update_duration(cb.message.chat.id, 0, seek_time)
         # await cb.message.reply_text(
         #     f"__Seeked back by {seek_time} seconds!__ \n\nBy: {cb.from_user.mention}"
         # )
@@ -185,6 +187,7 @@ async def controler_cb(_, cb: CallbackQuery):
         if (duration - (played + seek_time)) <= 10:
             return await cb.answer("Cannot seek beyond 10 seconds!", show_alert=True)
         to_seek = played + seek_time
+        LOGS.info(f"#to_seek: {to_seek}")
         try:
             context = {
                 "chat_id": que[0]["chat_id"],
@@ -196,10 +199,31 @@ async def controler_cb(_, cb: CallbackQuery):
             await hellmusic.seek_vc(context)
         except:
             return await cb.answer("Something went wrong!", show_alert=True)
-        Queue.update_duration(cb.message.chat.id, 1, to_seek)
+        Queue.update_duration(cb.message.chat.id, 1, seek_time)
         # await cb.message.reply_text(
         #     f"__Seeked forward by {seek_time} seconds!__ \n\nBy: {cb.from_user.mention}"
         # )
+    elif action == "position":
+        que = Queue.get_queue(cb.message.chat.id)
+        if que == []:
+            return await cb.answer("No songs in queue to get position!", show_alert=True)
+        played = int(que[0]["played"])
+        duration = formatter.mins_to_secs(que[0]["duration"])
+        try:
+            btns = Buttons.controls_markup_with_pos(video_id, chat_id, played)
+            await cb.message.edit_reply_markup(InlineKeyboardMarkup(btns))
+        except Exception as e:
+            return await cb.answer(f"Something went wrong! {str(e)}", show_alert=True)
+    elif action == "nothing":
+        que = Queue.get_queue(cb.message.chat.id)
+        if que == []:
+            return await cb.answer("No songs in queue to get position!", show_alert=True)
+        played = int(que[0]["played"])
+        duration = formatter.mins_to_secs(que[0]["duration"])
+        try:
+            btns = None
+        except Exception as e:
+            return await cb.answer(f"Something went wrong! {str(e)}", show_alert=True)
     elif action == "back":
         que = Queue.get_queue(cb.message.chat.id)
         if que == []:

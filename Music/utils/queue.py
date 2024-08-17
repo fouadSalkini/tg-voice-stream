@@ -102,6 +102,14 @@ class QueueDB:
         except IndexError:
             return None
         
+    def get_video_id(self, chat_id: int):
+        try:
+            return self.queue[chat_id][0]["video_id"]
+        except KeyError:
+            return None
+        except IndexError:
+            return None
+        
     def get_user(self, chat_id: int):
         try:
             return self.queue[chat_id][0]["user"]
