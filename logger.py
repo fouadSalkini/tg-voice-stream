@@ -1,6 +1,8 @@
 from pyrogram import Client
 from config import Config
 
+from pyrogram.types import (
+                    ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton)
 
 
 # Replace with your API ID, API Hash, and session name
@@ -28,7 +30,15 @@ print(id)
 with app:
     app.send_message(
         id, 
-        "Hello, this is a message from Pyrogram!"
+        "Hello, this is a message from Pyrogram reply markup!",
+        disable_notification=True,
+        disable_web_page_preview=True,
+        protect_content=True,
+        reply_markup=InlineKeyboardMarkup(
+                        [
+                            [InlineKeyboardButton("Data", callback_data="callback_data")],
+                            [InlineKeyboardButton("Docs", url="https://docs.pyrogram.org")]
+                        ])
         )
     
     
