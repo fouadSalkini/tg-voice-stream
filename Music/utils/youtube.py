@@ -17,9 +17,10 @@ from Music.helpers.strings import TEXTS
 class YouTube:
     def __init__(self):
         self.authconfig = {
-            "username": Config.YT_USERNAME,
-            "password": Config.YT_PASSWORD,
-            "cookies": Config.YT_COOKIEFILE,
+            # "username": Config.YT_USERNAME,
+            # "password": Config.YT_PASSWORD,
+            # "cookies": Config.YT_COOKIEFILE,
+            "cookiefile": Config.YT_COOKIEFILE,
             "user_agent": Config.YT_USERAGENT
         }
 
