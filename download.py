@@ -7,7 +7,7 @@ authconfig = {
             # "username": Config.YT_USERNAME,
             # "password": Config.YT_PASSWORD,
             "cookies": Config.YT_COOKIEFILE,
-            # "user_agent": Config.YT_USERAGENT
+            "user_agent": Config.YT_USERAGENT
         }
 ydl_opts = {
     'format': 'bestaudio',
