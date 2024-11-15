@@ -38,11 +38,25 @@ authconfig = {
             # "cookies": Config.YT_COOKIEFILE,
             "cookiefile": Config.YT_COOKIEFILE,
             # 'cookiefile': credentials.token_uri,  # Save token for reuse
-            "user_agent": Config.YT_USERAGENT
+            # "user_agent": Config.YT_USERAGENT
         }
 ydl_opts = {
+    # 'format': 'bestaudio',
+    # "outtmpl": "downloads/%(id)s.%(ext)s",
     'format': 'bestaudio',
-    "outtmpl": "downloads/%(id)s.%(ext)s"
+    'outtmpl': 'downloads/%(id)s.%(ext)s',
+    'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+    'http_headers': {
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Connection': 'keep-alive',
+        'DNT': '1',
+        'Upgrade-Insecure-Requests': '1'
+    },
+    'ratelimit': 1000000,  # Limit download speed to 1 MB/s
+    'sleep_interval': 10,
+    'max_sleep_interval': 30,
+    'verbose': True
 }
 ydl_opts.update(authconfig)
 
