@@ -27,9 +27,9 @@ video_url = 'https://www.youtube.com/watch?v=rCC70UbMuFY'
 AUTHORIZED_USER_FILE = 'authorized_user.json'
 
 
-# Authenticate using Google API
-credentials = Credentials.from_authorized_user_file(AUTHORIZED_USER_FILE)
-print(credentials)
+# # Authenticate using Google API
+# credentials = Credentials.from_authorized_user_file(AUTHORIZED_USER_FILE)
+# print(credentials)
 
 
 authconfig = {
