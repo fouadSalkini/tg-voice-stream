@@ -4,13 +4,13 @@ from config import Config
 id = "rCC70UbMuFY"
 video_url = 'https://www.youtube.com/watch?v=rCC70UbMuFY'
 authconfig = {
-            "username": Config.YT_USERNAME,
-            "password": Config.YT_PASSWORD,
+            # "username": Config.YT_USERNAME,
+            # "password": Config.YT_PASSWORD,
             "cookies": Config.YT_COOKIEFILE,
-            "user_agent": Config.YT_USERAGENT
+            # "user_agent": Config.YT_USERAGENT
         }
 ydl_opts = {
-    'format': 'best',
+    'format': 'bestaudio',
     "outtmpl": "downloads/%(id)s.%(ext)s"
 }
 ydl_opts.update(authconfig)
