@@ -62,10 +62,10 @@ class TEXTS:
     )
     SONG_CAPTION = (
         "**⊸ Title:** [{0}]({1})\n\n"
-        "**⊸ Views:** {2}\n"
+        # "**⊸ Views:** {2}\n"
         "**⊸ Duration:** {3}\n"
-        "**⊸ Requested By:** {4}\n\n"
-        "**❆** {5}"
+        # "**⊸ Requested By:** {4}\n\n"
+        # "**❆** {5}"
     )
     SOURCE = (
         "**Source 📦:**\n\n"
