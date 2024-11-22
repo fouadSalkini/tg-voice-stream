@@ -31,6 +31,30 @@ AUTHORIZED_USER_FILE = 'authorized_user.json'
 # credentials = Credentials.from_authorized_user_file(AUTHORIZED_USER_FILE)
 # print(credentials)
 
+##############################
+##############################
+## youtube download command ##
+##############################
+##############################
+## playlists: 
+# 86 done https://www.youtube.com/watch?v=KsG5KtGSZm8&list=PLr7X7rIaev6LAsGDoVZrDBTWmyXeD0L7h
+# 23 https://www.youtube.com/playlist?list=PLWA9mQ1O5nGWrtDqAsdRT2ObEZ7xmOucd
+# https://www.youtube.com/playlist?list=PLGbzILZDD0i9eFWuQ3JO1y_pwMYqDBsRY
+# https://www.youtube.com/playlist?list=PLGbzILZDD0i-FvgUWhs73CG7dUrphqfVF
+# https://www.youtube.com/watch?v=e-9dVwLWiAo&list=PLGbzILZDD0i-92GW5L8HKRu2Owdjw6n1L
+# https://www.youtube.com/playlist?list=PLYhaCT6xCcqkRESabizGrRnUJCJEorsXx
+
+# yt-dlp --cookies ../youtube.com_cookies.txt -f bestaudio --extract-audio --audio-format opus --audio-quality 64K -o "%(title)s.%(ext)s" "URL"
+# --playlist-items 1,2,3,...
+# --no-warnings "VIDEO_URL" > /dev/null 2>&1
+# -q (for less output)
+# yt-dlp --cookies youtube.com_cookies.txt --limit-rate 500K --sleep-interval 10 --max-sleep-interval 20 -f  bestaudio --extract-audio --audio-format opus --audio-quality 64K --no-warnings -o "downloads2/%(title)s.%(ext)s" "https://www.youtube.com/playlist?list=PLWA9mQ1O5nGWrtDqAsdRT2ObEZ7xmOucd"
+
+##############################
+##############################
+## youtube download command ##
+##############################
+##############################
 
 authconfig = {
             # "username": Config.YT_USERNAME,
