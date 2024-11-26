@@ -55,12 +55,12 @@ AUTHORIZED_USER_FILE = 'authorized_user.json'
 
 # tar --remove-files --exclude=archive_600_700.tar.gz -czvf archive_600_700.tar.gz .
 
-# yt-dlp --cookies ../youtube.com_cookies.txt -f bestaudio --extract-audio --audio-format opus --audio-quality 64K -o "%(title)s.%(ext)s" "URL"
+# yt-dlp --cookies youtube.com_cookies.txt --playlist-items 1 -f bestaudio --extract-audio --audio-format opus --audio-quality 64K -o "%(title)s.%(ext)s" "URL"
 # --playlist-items 1,2,3,...
 # --playlist-start 130 --playlist-end 600
 # --no-warnings "VIDEO_URL" > /dev/null 2>&1
 # -q (for less output)
-# yt-dlp --cookies youtube.com_cookies.txt --limit-rate 2M --sleep-interval 10 --max-sleep-interval 20 -f  bestaudio --extract-audio --audio-format opus --audio-quality 64K --no-warnings -o "downloads4/%(title)s.%(ext)s" "https://www.youtube.com/playlist?list=PLGbzILZDD0i-FvgUWhs73CG7dUrphqfVF"
+# yt-dlp --cookies youtube.com_cookies.txt --limit-rate 2M --sleep-interval 10 --max-sleep-interval 20 -f  bestaudio --extract-audio --audio-format opus --audio-quality 64K -o "test/%(title)s.%(ext)s" "https://www.youtube.com/playlist?list=PLYhaCT6xCcqkRESabizGrRnUJCJEorsXx"
 
 ##############################
 ##############################
