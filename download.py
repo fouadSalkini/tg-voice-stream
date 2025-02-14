@@ -53,7 +53,7 @@ AUTHORIZED_USER_FILE = 'authorized_user.json'
 #14 43 [done] https://www.youtube.com/watch?v=BuTM5lIlBjw&list=PL3lnNg8CXAt9DvQtTHAE7YXg6JSle_gu9
 #15 20 [done] https://www.youtube.com/playlist?list=PLQtPEQcFOMBax0xP7ZPYp8IkAmiTPw1WQ
 
-# tar --remove-files --exclude=group_1200__.tar.gz -czvf group_1200__.tar.gz .
+# tar --remove-files --exclude=group_56.tar.gz -czvf group_56.tar.gz .
 
 # yt-dlp --cookies youtube.com_cookies.txt --playlist-items 1 -f bestaudio --extract-audio --audio-format opus --audio-quality 64K -o "%(title)s.%(ext)s" "URL"
 # --playlist-items 1,2,3,...
