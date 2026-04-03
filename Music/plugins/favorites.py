@@ -107,7 +107,7 @@ async def delfavs_cb(_, cb: CallbackQuery):
     collection = await db.get_all_favorites(int(user_id))
     if action == "all":
         for i in collection:
-            await db.rem_favorites(int(user_id), i["video_id"])
+            await db.rem_favorites(int(user_id), i)
         return await cb.message.edit_text("Deleted all your favorites!")
     else:
         is_deleted = await db.rem_favorites(int(user_id), action)

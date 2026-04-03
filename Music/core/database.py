@@ -1,7 +1,7 @@
 import datetime
 import sys
 
-from motor.motor_asyncio import AsyncIOMotorClient
+import aiomysql
 
 from config import Config
 
@@ -10,31 +10,37 @@ from .logger import LOGS
 
 class Database(object):
     def __init__(self):
-        self.client = AsyncIOMotorClient(Config.DATABASE_URL)
-        self.db = self.client["HellMusicDB"]
+        self.pool = None
 
-        # mongo db collections
-        self.authchats = self.db.authchats
-        self.authusers = self.db.authusers
-        self.autoend = self.db.autoend
-        self.blocked_users = self.db.blocked_users
-        self.chats = self.db.chats
-        self.favorites = self.db.favorites
-        self.gban_db = self.db.gban_db
-        self.songsdb = self.db.songsdb
-        self.sudousers = self.db.sudousers
-        self.users = self.db.users
-
-        # local db collections
         self.active_vc = [{"chat_id": 0, "join_time": 0, "vc_type": "voice"}]
         self.inactive = {}
         self.loop = {}
         self.watcher = {}
 
-    # database connection #
+    async def _get_conn(self):
+        if self.pool is None:
+            await self.connect()
+        return await self.pool.acquire()
+
+    def _release_conn(self, conn):
+        self.pool.release(conn)
+
     async def connect(self):
         try:
-            self.client.admin.command("ping")
+            self.pool = await aiomysql.create_pool(
+                host=Config.MYSQL_HOST,
+                port=Config.MYSQL_PORT,
+                user=Config.MYSQL_USER,
+                password=Config.MYSQL_PASSWORD,
+                db=Config.MYSQL_DB,
+                charset="utf8mb4",
+                autocommit=True,
+                minsize=1,
+                maxsize=10,
+            )
+            conn = await self._get_conn()
+            await conn.ping()
+            self._release_conn(conn)
             LOGS.info("\x3e\x3e\x20\x44\x61\x74\x61\x62\x61\x73\x65\x20\x63\x6f\x6e\x6e\x65\x63\x74\x69\x6f\x6e\x20\x73\x75\x63\x63\x65\x73\x73\x66\x75\x6c\x21")
         except Exception as e:
             LOGS.error(f"\x44\x61\x74\x61\x62\x61\x73\x65\x20\x63\x6f\x6e\x6e\x65\x63\x74\x69\x6f\x6e\x20\x66\x61\x69\x6c\x65\x64\x3a\x20\x27{e}\x27")
@@ -42,65 +48,136 @@ class Database(object):
 
     # users db #
     async def add_user(self, user_id: int, user_name: str):
-        context = {
-            "user_id": user_id,
-            "user_name": user_name,
-            "join_date": datetime.datetime.now().strftime("%d-%m-%Y %H:%M"),
-            "songs_played": 0,
-        }
-        await self.users.insert_one(context)
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute(
+                    "INSERT IGNORE INTO users (user_id, user_name, join_date, songs_played) VALUES (%s, %s, %s, %s)",
+                    (user_id, user_name, datetime.datetime.now().strftime("%d-%m-%Y %H:%M"), 0),
+                )
+        finally:
+            self._release_conn(conn)
 
     async def delete_user(self, user_id: int):
-        await self.users.delete_one({"user_id": user_id})
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute("DELETE FROM users WHERE user_id = %s", (user_id,))
+        finally:
+            self._release_conn(conn)
 
     async def is_user_exist(self, user_id: int) -> bool:
-        user = await self.users.find_one({"user_id": user_id})
-        return bool(user)
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute("SELECT 1 FROM users WHERE user_id = %s", (user_id,))
+                row = await cur.fetchone()
+                return row is not None
+        finally:
+            self._release_conn(conn)
 
     async def get_user(self, user_id: int):
-        user = await self.users.find_one({"user_id": user_id})
-        return user
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor(aiomysql.DictCursor) as cur:
+                await cur.execute("SELECT * FROM users WHERE user_id = %s", (user_id,))
+                return await cur.fetchone()
+        finally:
+            self._release_conn(conn)
 
     async def get_all_users(self):
-        users = self.users.find({})
-        return users
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor(aiomysql.DictCursor) as cur:
+                await cur.execute("SELECT * FROM users")
+                return await cur.fetchall()
+        finally:
+            self._release_conn(conn)
 
     async def total_users_count(self):
-        count = await self.users.count_documents({})
-        return count
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute("SELECT COUNT(*) FROM users")
+                row = await cur.fetchone()
+                return row[0]
+        finally:
+            self._release_conn(conn)
 
     async def update_user(self, user_id: int, key: str, value):
-        if key == "songs_played":
-            prev = await self.users.find_one({"user_id": user_id})
-            value = prev[key] + value
-        await self.users.update_one({"user_id": user_id}, {"$set": {key: value}})
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                if key == "songs_played":
+                    await cur.execute(
+                        "UPDATE users SET songs_played = songs_played + %s WHERE user_id = %s",
+                        (value, user_id),
+                    )
+                else:
+                    await cur.execute(
+                        f"UPDATE users SET {key} = %s WHERE user_id = %s",
+                        (value, user_id),
+                    )
+        finally:
+            self._release_conn(conn)
 
     # chat db #
     async def add_chat(self, chat_id: int):
-        context = {
-            "chat_id": chat_id,
-            "join_date": datetime.datetime.now(),
-        }
-        await self.chats.insert_one(context)
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute(
+                    "INSERT IGNORE INTO chats (chat_id, join_date) VALUES (%s, %s)",
+                    (chat_id, datetime.datetime.now()),
+                )
+        finally:
+            self._release_conn(conn)
 
     async def delete_chat(self, chat_id: int):
-        await self.chats.delete_one({"chat_id": chat_id})
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute("DELETE FROM chats WHERE chat_id = %s", (chat_id,))
+        finally:
+            self._release_conn(conn)
 
     async def is_chat_exist(self, chat_id: int) -> bool:
-        chat = await self.chats.find_one({"chat_id": chat_id})
-        return bool(chat)
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute("SELECT 1 FROM chats WHERE chat_id = %s", (chat_id,))
+                row = await cur.fetchone()
+                return row is not None
+        finally:
+            self._release_conn(conn)
 
     async def get_chat(self, chat_id: int):
-        chat = await self.chats.find_one({"chat_id": chat_id})
-        return chat
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor(aiomysql.DictCursor) as cur:
+                await cur.execute("SELECT * FROM chats WHERE chat_id = %s", (chat_id,))
+                return await cur.fetchone()
+        finally:
+            self._release_conn(conn)
 
     async def get_all_chats(self):
-        chats = self.chats.find({})
-        return chats
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor(aiomysql.DictCursor) as cur:
+                await cur.execute("SELECT * FROM chats")
+                return await cur.fetchall()
+        finally:
+            self._release_conn(conn)
 
     async def total_chats_count(self):
-        count = await self.chats.count_documents({})
-        return count
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute("SELECT COUNT(*) FROM chats")
+                row = await cur.fetchone()
+                return row[0]
+        finally:
+            self._release_conn(conn)
 
     # active vc db #
     async def get_active_vc(self) -> list:
@@ -108,7 +185,7 @@ class Database(object):
 
     async def add_active_vc(self, chat_id: int, vc_type: str):
         cid = [x["chat_id"] for x in self.active_vc]
-        if not chat_id in cid:
+        if chat_id not in cid:
             self.active_vc.append(
                 {
                     "chat_id": chat_id,
@@ -119,10 +196,7 @@ class Database(object):
 
     async def is_active_vc(self, chat_id: int) -> bool:
         cid = [x["chat_id"] for x in self.active_vc]
-        if chat_id not in cid:
-            return False
-        else:
-            return True
+        return chat_id in cid
 
     async def remove_active_vc(self, chat_id: int):
         for x in self.active_vc:
@@ -130,36 +204,39 @@ class Database(object):
                 self.active_vc.remove(x)
 
     async def total_actvc_count(self) -> int:
-        count = self.active_vc
-        return len(count) - 1
+        return len(self.active_vc) - 1
 
     # autoend db #
     async def get_autoend(self) -> bool:
         try:
-            autoend = await self.autoend.find_one({"autoend": "on"})
-            if autoend:
-                return True
-            else:
-                return False
+            conn = await self._get_conn()
+            try:
+                async with conn.cursor() as cur:
+                    await cur.execute("SELECT enabled FROM autoend WHERE id = 1")
+                    row = await cur.fetchone()
+                    return bool(row and row[0])
+            finally:
+                self._release_conn(conn)
         except:
             return False
 
     async def set_autoend(self, autoend: bool):
-        _db = await self.autoend.find_one({"autoend": "on"})
-        if autoend is True:
-            if _db:
-                return
-            await self.autoend.insert_one({"autoend": "on"})
-        else:
-            await self.autoend.delete_one({"autoend": "on"})
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute(
+                    "INSERT INTO autoend (id, enabled) VALUES (1, %s) ON DUPLICATE KEY UPDATE enabled = %s",
+                    (autoend, autoend),
+                )
+        finally:
+            self._release_conn(conn)
 
     # loop db #
     async def set_loop(self, chat_id: int, loop: int):
         self.loop[chat_id] = loop
 
     async def get_loop(self, chat_id: int) -> int:
-        loop = self.loop.get(chat_id)
-        return loop or 0
+        return self.loop.get(chat_id) or 0
 
     # watcher db #
     async def set_watcher(self, chat_id: int, key: str, watch: bool):
@@ -167,193 +244,340 @@ class Database(object):
 
     async def get_watcher(self, chat_id: int, key: str) -> bool:
         try:
-            watch = self.watcher[chat_id][key]
+            return self.watcher[chat_id][key]
         except KeyError:
-            watch = False
-        return watch
+            return False
 
     # sudousers db #
     async def get_sudo_users(self) -> list:
-        users = await self.sudousers.find_one({"sudo": "sudo"})
-        if not users:
-            return []
-        return users["user_ids"]
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute("SELECT user_id FROM sudo_users")
+                rows = await cur.fetchall()
+                return [row[0] for row in rows]
+        finally:
+            self._release_conn(conn)
 
     async def add_sudo(self, user_id: int) -> bool:
-        users = await self.get_sudo_users()
-        users.append(user_id)
-        await self.sudousers.update_one(
-            {"sudo": "sudo"}, {"$set": {"user_ids": users}}, upsert=True
-        )
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute(
+                    "INSERT IGNORE INTO sudo_users (user_id) VALUES (%s)", (user_id,)
+                )
+        finally:
+            self._release_conn(conn)
         return True
 
     async def remove_sudo(self, user_id: int) -> bool:
-        users = await self.get_sudo_users()
-        users.remove(user_id)
-        await self.sudousers.update_one(
-            {"sudo": "sudo"}, {"$set": {"user_ids": users}}, upsert=True
-        )
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute("DELETE FROM sudo_users WHERE user_id = %s", (user_id,))
+        finally:
+            self._release_conn(conn)
         return True
 
     # blocked users db #
     async def get_blocked_users(self) -> list:
-        users = await self.blocked_users.find_one({"blocked": "blocked"})
-        if not users:
-            return []
-        return users["user_ids"]
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute("SELECT user_id FROM blocked_users")
+                rows = await cur.fetchall()
+                return [row[0] for row in rows]
+        finally:
+            self._release_conn(conn)
 
     async def add_blocked_user(self, user_id: int) -> bool:
-        users = await self.get_blocked_users()
-        users.append(user_id)
-        await self.blocked_users.update_one(
-            {"blocked": "blocked"}, {"$set": {"user_ids": users}}, upsert=True
-        )
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute(
+                    "INSERT IGNORE INTO blocked_users (user_id) VALUES (%s)", (user_id,)
+                )
+        finally:
+            self._release_conn(conn)
         return True
 
     async def remove_blocked_user(self, user_id: int) -> bool:
-        users = await self.get_blocked_users()
-        users.remove(user_id)
-        await self.blocked_users.update_one(
-            {"blocked": "blocked"}, {"$set": {"user_ids": users}}, upsert=True
-        )
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute("DELETE FROM blocked_users WHERE user_id = %s", (user_id,))
+        finally:
+            self._release_conn(conn)
         return True
 
     async def total_block_count(self) -> int:
-        count = await self.get_blocked_users()
-        return len(count)
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute("SELECT COUNT(*) FROM blocked_users")
+                row = await cur.fetchone()
+                return row[0]
+        finally:
+            self._release_conn(conn)
 
     # gbanned users db #
     async def get_gbanned_users(self) -> list:
-        users = await self.gban_db.find_one({"gbanned": "gbanned"})
-        if not users:
-            return []
-        return users["user_ids"]
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute("SELECT user_id FROM gban_users")
+                rows = await cur.fetchall()
+                return [row[0] for row in rows]
+        finally:
+            self._release_conn(conn)
 
     async def add_gbanned_user(self, user_id: int) -> bool:
-        users = await self.get_gbanned_users()
-        users.append(user_id)
-        await self.gban_db.update_one(
-            {"gbanned": "gbanned"}, {"$set": {"user_ids": users}}, upsert=True
-        )
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute(
+                    "INSERT IGNORE INTO gban_users (user_id) VALUES (%s)", (user_id,)
+                )
+        finally:
+            self._release_conn(conn)
         return True
 
     async def remove_gbanned_users(self, user_id: int) -> bool:
-        users = await self.get_gbanned_users()
-        users.remove(user_id)
-        await self.gban_db.update_one(
-            {"gbanned": "gbanned"}, {"$set": {"user_ids": users}}, upsert=True
-        )
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute("DELETE FROM gban_users WHERE user_id = %s", (user_id,))
+        finally:
+            self._release_conn(conn)
         return True
 
     async def is_gbanned_user(self, user_id: int) -> bool:
-        users = await self.gban_db.find_one({"gbanned": "gbanned"})
-        if users and user_id in users["user_ids"]:
-            return True
-        else:
-            return False
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute("SELECT 1 FROM gban_users WHERE user_id = %s", (user_id,))
+                row = await cur.fetchone()
+                return row is not None
+        finally:
+            self._release_conn(conn)
 
     async def total_gbans_count(self) -> int:
-        count = await self.get_gbanned_users()
-        return len(count)
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute("SELECT COUNT(*) FROM gban_users")
+                row = await cur.fetchone()
+                return row[0]
+        finally:
+            self._release_conn(conn)
 
     # authusers db #
     async def add_authusers(self, chat_id: int, user_id: int, details: dict):
-        await self.authusers.insert_one(
-            {"chat_id": chat_id, "user_id": user_id, "details": details}
-        )
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute(
+                    "INSERT IGNORE INTO auth_users (chat_id, user_id, user_name, auth_by_id, auth_by_name, auth_date) VALUES (%s, %s, %s, %s, %s, %s)",
+                    (
+                        chat_id,
+                        user_id,
+                        details.get("user_name", ""),
+                        details.get("auth_by_id", 0),
+                        details.get("auth_by_name", ""),
+                        details.get("auth_date", ""),
+                    ),
+                )
+        finally:
+            self._release_conn(conn)
 
     async def is_authuser(self, chat_id: int, user_id: int) -> bool:
-        chat = await self.authusers.find_one({"chat_id": chat_id, "user_id": user_id})
-        return bool(chat)
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute(
+                    "SELECT 1 FROM auth_users WHERE chat_id = %s AND user_id = %s",
+                    (chat_id, user_id),
+                )
+                row = await cur.fetchone()
+                return row is not None
+        finally:
+            self._release_conn(conn)
 
     async def get_authuser(self, chat_id: int, user_id: int):
-        chat = await self.authusers.find_one({"chat_id": chat_id, "user_id": user_id})
-        return chat["details"] if chat else {}
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor(aiomysql.DictCursor) as cur:
+                await cur.execute(
+                    "SELECT user_name, auth_by_id, auth_by_name, auth_date FROM auth_users WHERE chat_id = %s AND user_id = %s",
+                    (chat_id, user_id),
+                )
+                row = await cur.fetchone()
+                if row:
+                    return {
+                        "user_name": row["user_name"],
+                        "auth_by_id": row["auth_by_id"],
+                        "auth_by_name": row["auth_by_name"],
+                        "auth_date": row["auth_date"],
+                    }
+                return {}
+        finally:
+            self._release_conn(conn)
 
     async def get_all_authusers(self, chat_id: int) -> list:
-        all_users = []
-        users = self.authusers.find({"chat_id": chat_id})
-        async for user in users:
-            all_users.append(user["user_id"])
-        return all_users if all_users else []
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute(
+                    "SELECT user_id FROM auth_users WHERE chat_id = %s", (chat_id,)
+                )
+                rows = await cur.fetchall()
+                return [row[0] for row in rows]
+        finally:
+            self._release_conn(conn)
 
     async def remove_authuser(self, chat_id: int, user_id: int):
-        await self.authusers.delete_one({"chat_id": chat_id, "user_id": user_id})
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute(
+                    "DELETE FROM auth_users WHERE chat_id = %s AND user_id = %s",
+                    (chat_id, user_id),
+                )
+        finally:
+            self._release_conn(conn)
 
     # authchats db #
     async def get_authchats(self) -> list:
-        chats = await self.authchats.find_one({"authchats": "authchats"})
-        if not chats:
-            return []
-        return chats["chat_ids"]
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute("SELECT chat_id FROM auth_chats")
+                rows = await cur.fetchall()
+                return [row[0] for row in rows]
+        finally:
+            self._release_conn(conn)
 
     async def add_authchat(self, chat_id: int) -> bool:
-        chats = await self.get_authchats()
-        chats.append(chat_id)
-        await self.authchats.update_one(
-            {"authchats": "authchats"}, {"$set": {"chat_ids": chats}}, upsert=True
-        )
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute(
+                    "INSERT IGNORE INTO auth_chats (chat_id) VALUES (%s)", (chat_id,)
+                )
+        finally:
+            self._release_conn(conn)
         return True
 
     async def remove_authchat(self, chat_id: int) -> bool:
-        chats = await self.get_authchats()
-        chats.remove(chat_id)
-        await self.authchats.update_one(
-            {"authchats": "authchats"}, {"$set": {"chat_ids": chats}}, upsert=True
-        )
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute("DELETE FROM auth_chats WHERE chat_id = %s", (chat_id,))
+        finally:
+            self._release_conn(conn)
         return True
 
     async def is_authchat(self, chat_id: int) -> bool:
-        chats = await self.authchats.find_one({"authchats": "authchats"})
-        if chats and chat_id in chats["chat_ids"]:
-            return True
-        return False
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute("SELECT 1 FROM auth_chats WHERE chat_id = %s", (chat_id,))
+                row = await cur.fetchone()
+                return row is not None
+        finally:
+            self._release_conn(conn)
 
     # favorites db #
     async def get_favs(self, user_id: int) -> dict:
-        favs = await self.favorites.find_one({"user_id": user_id})
-        return favs["tracks"] if favs else {}
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor(aiomysql.DictCursor) as cur:
+                await cur.execute(
+                    "SELECT video_id, title, duration, add_date FROM favorites WHERE user_id = %s",
+                    (user_id,),
+                )
+                rows = await cur.fetchall()
+                result = {}
+                for row in rows:
+                    result[row["video_id"]] = {
+                        "video_id": row["video_id"],
+                        "title": row["title"],
+                        "duration": row["duration"],
+                        "add_date": row["add_date"],
+                    }
+                return result
+        finally:
+            self._release_conn(conn)
 
     async def add_favorites(self, user_id: int, video_id: str, context: dict):
-        favs = await self.get_favs(user_id)
-        favs[video_id] = context
-        await self.favorites.update_one(
-            {"user_id": user_id}, {"$set": {"tracks": favs}}, upsert=True
-        )
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute(
+                    "INSERT INTO favorites (user_id, video_id, title, duration, add_date) VALUES (%s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE title = VALUES(title), duration = VALUES(duration), add_date = VALUES(add_date)",
+                    (
+                        user_id,
+                        video_id,
+                        context.get("title", ""),
+                        context.get("duration", ""),
+                        context.get("add_date", ""),
+                    ),
+                )
+        finally:
+            self._release_conn(conn)
 
     async def rem_favorites(self, user_id: int, video_id: str) -> bool:
-        favs = await self.get_favs(user_id)
-        if video_id in favs:
-            del favs[video_id]
-            await self.favorites.update_one(
-                {"user_id": user_id}, {"$set": {"tracks": favs}}, upsert=True
-            )
-            return True
-        return False
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute(
+                    "DELETE FROM favorites WHERE user_id = %s AND video_id = %s",
+                    (user_id, video_id),
+                )
+                return cur.rowcount > 0
+        finally:
+            self._release_conn(conn)
 
     async def get_all_favorites(self, user_id: int) -> list:
-        favs = []
-        for x in await self.get_favs(user_id):
-            favs.append(x)
-        return favs
+        favs = await self.get_favs(user_id)
+        return list(favs.keys())
 
     async def get_favorite(self, user_id: int, video_id: str) -> dict:
-        favs = await self.get_favs(user_id)
-        return favs[video_id] if video_id in favs else {}
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor(aiomysql.DictCursor) as cur:
+                await cur.execute(
+                    "SELECT video_id, title, duration, add_date FROM favorites WHERE user_id = %s AND video_id = %s",
+                    (user_id, video_id),
+                )
+                row = await cur.fetchone()
+                if row:
+                    return dict(row)
+                return {}
+        finally:
+            self._release_conn(conn)
 
     # songs db #
     async def total_songs_count(self) -> int:
-        count = await self.songsdb.find_one({"songs": "songs"})
-        if count:
-            return count["count"]
-        return 0
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute("SELECT count FROM songs_counter WHERE id = 1")
+                row = await cur.fetchone()
+                return row[0] if row else 0
+        finally:
+            self._release_conn(conn)
 
     async def update_songs_count(self, count: int):
-        songs = await self.total_songs_count()
-        songs = songs + count
-        await self.songsdb.update_one(
-            {"songs": "songs"}, {"$set": {"count": songs}}, upsert=True
-        )
+        conn = await self._get_conn()
+        try:
+            async with conn.cursor() as cur:
+                await cur.execute(
+                    "INSERT INTO songs_counter (id, count) VALUES (1, %s) ON DUPLICATE KEY UPDATE count = count + %s",
+                    (count, count),
+                )
+        finally:
+            self._release_conn(conn)
 
 
 db = Database()

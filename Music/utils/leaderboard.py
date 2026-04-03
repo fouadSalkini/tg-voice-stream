@@ -33,7 +33,7 @@ class Leaderboard:
     async def get_top_10(self) -> list:
         users = await db.get_all_users()
         all_guys = []
-        async for user in users:
+        for user in users:
             id = int(user["user_id"])
             songs = int(user["songs_played"])
             user_name = user["user_name"]
@@ -60,7 +60,7 @@ class Leaderboard:
         success = failed = count = 0
         chats = await db.get_all_chats()
         async with aiofiles.open(self.file_name, mode="w") as leaderboard_log_file:
-            async for chat in chats:
+            for chat in chats:
                 try:
                     sts, msg = await self.send_message(
                         hellbot.app, buttons, int(chat["chat_id"]), text

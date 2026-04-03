@@ -16,7 +16,12 @@ class Config(object):
     API_HASH = getenv("API_HASH", None)                # get from my.telegram.org
     API_ID = int(getenv("API_ID", 0))                  # get from my.telegram.org
     BOT_TOKEN = getenv("BOT_TOKEN", None)              # get from @BotFather
-    DATABASE_URL = getenv("DATABASE_URL", None)        # from https://cloud.mongodb.com/
+    DATABASE_URL = getenv("DATABASE_URL", None)        # MySQL connection string
+    MYSQL_HOST = getenv("MYSQL_HOST", "localhost")
+    MYSQL_PORT = int(getenv("MYSQL_PORT", 3306))
+    MYSQL_USER = getenv("MYSQL_USER", "root")
+    MYSQL_PASSWORD = getenv("MYSQL_PASSWORD", "")
+    MYSQL_DB = getenv("MYSQL_DB", "hellmusic")
     HELLBOT_SESSION = getenv("HELLBOT_SESSION", None)  # enter your session string here
     LOGGER_CHANNEL = int(getenv("LOGGER_CHANNEL", 0))            # make a channel and get its ID
     OWNER_ID = getenv("OWNER_ID", "")                  # enter your id here

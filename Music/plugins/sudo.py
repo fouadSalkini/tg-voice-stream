@@ -77,7 +77,7 @@ async def gban(_, message: Message):
     if message.command[0] == "gban":
         all_chats = []
         chats = await db.get_all_chats()
-        async for chat in chats:
+        for chat in chats:
             all_chats.append(int(chat["chat_id"]))
         eta = formatter.get_readable_time(len(all_chats))
         hell = await message.reply_text(
@@ -126,7 +126,7 @@ async def gungabn(_, message: Message):
     if message.command[0] == "ungban":
         all_chats = []
         chats = await db.get_all_chats()
-        async for chat in chats:
+        for chat in chats:
             all_chats.append(int(chat["chat_id"]))
         eta = formatter.get_readable_time(len(all_chats))
         hell = await message.reply_text(

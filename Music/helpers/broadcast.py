@@ -66,7 +66,7 @@ class Broadcast:
         file_name = self.file_name.format(round(time.time()))
         async with aiofiles.open(file_name, "w") as broadcast_log_file:
             for target in targets:
-                async for user in target:
+                for user in target:
                     try:
                         sts, msg = await self.send_msg(
                             int(user["user_id"]),
