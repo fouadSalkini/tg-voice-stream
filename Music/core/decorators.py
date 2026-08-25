@@ -14,8 +14,14 @@ on_mode = ["on", "enable", "yes", "true"]
 def check_mode(func):
     @wraps(func)
     async def decorated(client, message):
+        if message.sender_chat:
+            return await message.reply_text(
+                "Seems like you are an anonymous admin. Please revert back to normal to use this command."
+            )
+        if not message.from_user:
+            return
         user_id = message.from_user.id
-        if (Config.PRIVATE_MODE).lower in on_mode:
+        if Config.PRIVATE_MODE.lower() in on_mode:
             if user_id not in Config.SUDO_USERS:
                 return
         await func(client, message)
