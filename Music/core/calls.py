@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import os
 
@@ -9,7 +10,11 @@ from pyrogram.errors import (
 )
 from pyrogram.types import InlineKeyboardMarkup
 from pytgcalls import PyTgCalls, StreamType
-from pytgcalls.exceptions import AlreadyJoinedError, NoActiveGroupCall
+from pytgcalls.exceptions import (
+    AlreadyJoinedError,
+    NoActiveGroupCall,
+    TelegramServerError,
+)
 from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
 from pytgcalls.types.input_stream.quality import MediumQualityAudio, MediumQualityVideo
 
@@ -239,6 +244,14 @@ class HellMusic(PyTgCalls):
             except Exception as e:
                 raise ChangeVCException(f"[ChangeVCException]: {e}")
 
+    def _drop_call_cache(self, chat_id: int):
+        # stale cached group-call entry (e.g. the VC was closed and re-opened,
+        # so its call id changed) makes joins fail until cache expiry
+        try:
+            self.music._app._bind_client._cache.drop_cache(chat_id)
+        except Exception:
+            pass
+
     async def join_vc(self, chat_id: int, file_path: str, video: bool = False):
         # define input stream
         if video:
@@ -270,6 +283,20 @@ class HellMusic(PyTgCalls):
             raise UserException(
                 f"[UserException]: Already joined in the voice chat. If this is a mistake then try to restart the voice chat."
             )
+        except TelegramServerError:
+            # transient: telegram needs a moment to settle after a call was
+            # closed/re-opened. clean any half-joined state, drop the stale
+            # cache and retry once.
+            await self.leave_vc(chat_id)
+            self._drop_call_cache(chat_id)
+            await asyncio.sleep(3)
+            try:
+                await self.music.join_group_call(
+                    chat_id, input_stream, stream_type=StreamType().pulse_stream
+                )
+            except Exception as e:
+                await self.leave_vc(chat_id)
+                raise UserException(f"[UserException]: {e}")
         except Exception as e:
             raise UserException(f"[UserException]: {e}")
 
@@ -279,7 +306,29 @@ class HellMusic(PyTgCalls):
         user_ids = [user.user_id for user in users]
         await self.autoend(chat_id, user_ids)
 
+    async def _ensure_peer_cached(self, chat_id: int):
+        # the assistant runs on MemoryStorage with no_updates=True, so its peer
+        # cache starts empty on every boot and never learns about chats it was
+        # already added to. Scan dialogs until this chat is found so that
+        # resolve_peer (used internally by pytgcalls) can succeed.
+        try:
+            await hellbot.user.resolve_peer(chat_id)
+            return
+        except Exception:
+            pass
+        try:
+            async for dialog in hellbot.user.get_dialogs(limit=200):
+                if dialog.chat and dialog.chat.id == chat_id:
+                    return
+        except Exception as e:
+            raise UserException(f"[UserException]: Cannot access chat {chat_id}: {e}")
+        try:
+            await hellbot.user.resolve_peer(chat_id)
+        except Exception as e:
+            raise UserException(f"[UserException]: Cannot access chat {chat_id}: {e}")
+
     async def join_gc(self, chat_id: int):
+        await self._ensure_peer_cached(chat_id)
         try:
             try:
                 get = await hellbot.app.get_chat_member(chat_id, hellbot.user.id)

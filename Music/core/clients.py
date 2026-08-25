@@ -43,6 +43,13 @@ class HellClient(Client):
             self.user.name = me.first_name
             self.user.username = me.username
             try:
+                # MemoryStorage starts with an empty peer cache; warm it up so
+                # chats are resolvable for pytgcalls without waiting for /play
+                async for _ in self.user.get_dialogs(limit=100):
+                    pass
+            except Exception as e:
+                LOGS.warning(f"Peer cache warmup failed: {e}")
+            try:
                 await self.user.join_chat("Its_HellBot")
                 await self.user.join_chat("https://t.me/joinchat/LUzuM9rrEdIwZTFl")
             except:

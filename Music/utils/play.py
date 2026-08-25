@@ -102,7 +102,8 @@ class Player:
                 await message.reply_text(str(e))
                 Queue.clear_queue(chat_id)
                 os.remove(file_path)
-                os.remove(photo)
+                if photo:
+                    os.remove(photo)
                 return
             btns = Buttons.player_markup(chat_id, video_id, hellbot.app.username)
             if photo:
